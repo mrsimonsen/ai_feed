@@ -1,7 +1,9 @@
 import requests
 import logging
 import feedparser
-import calendar
+import bleach
+import html
+import unicodedata
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -38,7 +40,6 @@ def fetch_feeds(feeds_dict):
 			#raise a requests.exception.HTTPError if the status is 4xx or 5xx
 			response.raise_for_status()
 
-			#store successful data
 			feed_data[name] = response.content
 			logging.info(f"Successfully downloaded '{name}' ({len(response.content)} bytes).")
 
@@ -51,6 +52,17 @@ def fetch_feeds(feeds_dict):
 			logging.error(f"Unexpected error processing '{name}'. Error: {e}")
 
 	return feed_data
+
+def clean_html_text(raw_text):
+	'''
+	Sanitizes text by removing HTML tags, unescaping HTML entities,
+	and stripping invisible or problematic Unicode characters.
+	'''
+	cleaned = bleach.clean(raw_text, tags=[], strip=True)
+	cleaned = html.unescape(cleaned)
+	cleaned = unicodedata.normalize('NFKD', cleaned)
+	cleaned = cleaned.replace('\u2060', '')
+	return cleaned.strip()
 
 def parse_recent_episodes(feed_data):
 	'''
@@ -76,7 +88,7 @@ def parse_recent_episodes(feed_data):
 			if unique_id in seen_ids:
 				continue
 
-			#time extraction and conversion
+			#check for valid publish time
 			if not hasattr(entry, 'published_parsed') or not entry.published_parsed:
 				logging.warning(f"Missing or unparsable date for '{unique_id}' in {feed_name}'. Skipping.")
 				continue
@@ -94,10 +106,12 @@ def parse_recent_episodes(feed_data):
 			#extract data
 			seen_ids.add(unique_id)
 			dt_mt = dt_utc.astimezone(ZoneInfo("America/Denver"))
+			clean_title = clean_html_text(entry.get('title', 'No Title'))
+			clean_description = clean_html_text(entry.get('summary', entry.get('description', 'No Description')))
 			recent_episodes.append({
 				'feed_name': feed_name,
-				'title': entry.get('title', 'No Title' ),
-				'description': entry.get('summary', entry.get('description', 'No Description')),
+				'title': clean_title,
+				'description': clean_description,
 				'publish_date_mt': dt_mt.strftime('%Y-%m-%d %I:%M %p %Z'),
 				'link': entry.get('link', 'No Link')
 			})
