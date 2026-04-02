@@ -123,15 +123,35 @@ def parse_recent_episodes(feed_data):
 
 def format_email_body(episodes):
 	'''
-	Groups episodes by feed and constructs a plain text email body
-	with clearly separated section headers.
+	Constructs a plain text email body with clearly separated section headers
+	from a dictionary of episodes grouped by feed.
 	'''
-	if not episodes:
+	has_episodes = any(len(eps) > 0 for eps in episodes.values())
+	if not has_episodes:
 		return "No new AI updates in the last 24 hours."
 	
-	grouped = 
+	lines = ["Here is your daily AI feed update:\n"]
+
+	for feed, eps in episodes.items():
+		#skip feeds without episodes
+		if not eps:
+			continue
+
+		#source header
+		lines.append('='*25)
+		lines.append(f'Source: {feed.upper()}')
+		lines.append('='*25+'\n')
+
+		for ep in eps:
+			lines.append(f'TITLE: {ep['title']}')
+			lines.append(f'PUBLISHED: {ep['publish_date_mt']}\n')
+			lines.append(f'LINK: {ep['link']}\n')
+			lines.append(f'DESCRIPTION:\n{ep['description']}\n')
+			lines.append(f'-'*30+'\n')
+
+	return '\n'.join(lines)
 
 if __name__ == "__main__":
-	data = parse_recent_episodes(fetch_feeds(FEEDS))
+	data = format_email_body(parse_recent_episodes(fetch_feeds(FEEDS)))
 	print("Process complete")
 	print(data)
