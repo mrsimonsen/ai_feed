@@ -6,9 +6,13 @@ import os
 import requests
 import smtplib
 import unicodedata
+from dotenv import load_dotenv
 from email.message import EmailMessage
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
+
+#load environment variables
+load_dotenv()
 
 #configure logging
 logging.basicConfig(
@@ -138,20 +142,61 @@ def format_email_body(episodes):
 			continue
 
 		#source header
-		lines.append('='*25)
+		lines.append('='*50)
 		lines.append(f'Source: {feed.upper()}')
-		lines.append('='*25+'\n')
+		lines.append('='*50+'\n')
 
 		for ep in eps:
 			lines.append(f'TITLE: {ep['title']}')
-			lines.append(f'PUBLISHED: {ep['publish_date_mt']}\n')
+			lines.append(f'PUBLISHED: {ep['publish_date_mt']}')
 			lines.append(f'LINK: {ep['link']}\n')
 			lines.append(f'DESCRIPTION:\n{ep['description']}\n')
-			lines.append(f'-'*30+'\n')
+			lines.append(f'-'*100+'\n')
 
 	return '\n'.join(lines)
 
+def send_email(body_text):
+	'''
+	Connects to an SMTP server, authenticates, and dispatches the email.
+	'''
+	SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
+	SENDER_APP_PASS = os.environ.get("SENDER_APP_PASS")
+	RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL")
+
+	if not all([SENDER_EMAIL, SENDER_APP_PASS, RECEIVER_EMAIL]):
+		logging.error("Missing email credentials. Ensure SENDER_EMAIL, SENDER_APP_PASS, and RECEIVER_EMAIL are set in your environment.")
+		return
+	
+	#compile email
+	msg = EmailMessage()
+	msg.set_content(body_text)
+	msg['Subject'] = f"Daily AI Feed Update - {datetime.now().strftime('%Y-%m-%d')}"
+	msg['From'] = SENDER_EMAIL
+	msg['To'] = RECEIVER_EMAIL
+
+	try:
+		#setup smtplib using Gmail's standard TLS port
+		with smtplib.SMTP('smtp.gmail.com', 587) as server:
+			server.starttls()
+			#authenticate
+			server.login(SENDER_EMAIL, SENDER_APP_PASS)
+			server.send_message(msg)
+			logging.info("Email successfully dispatched.")
+	except smtplib.SMTPAuthenticationError:
+		logging.error("SMTP Authentication Error: Check the App Password.")
+	except Exception as e:
+		logging.error(f'Failed to send email. Error: {e}')
+
+
 if __name__ == "__main__":
-	data = format_email_body(parse_recent_episodes(fetch_feeds(FEEDS)))
-	print("Process complete")
-	print(data)
+	logging.info("Starting feed extraction...")
+	raw_data = fetch_feeds(FEEDS)
+	recent_episodes = parse_recent_episodes(raw_data)
+	
+	logging.info(f'Found {len(recent_episodes)} recent episodes.')
+	email_body = format_email_body(recent_episodes)
+
+	logging.info("Attempting transmission...")
+	send_email(email_body)
+
+	logging.info('Process complete.')
