@@ -1,9 +1,12 @@
-import requests
-import logging
-import feedparser
 import bleach
+import feedparser
 import html
+import logging
+import os
+import requests
+import smtplib
 import unicodedata
+from email.message import EmailMessage
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -73,11 +76,12 @@ def parse_recent_episodes(feed_data):
 	now_utc = datetime.now(timezone.utc)
 	cutoff_time = now_utc - timedelta(hours=24)
 
-	recent_episodes = []
+	recent_episodes = {}
 	seen_ids = set()
 
 	for feed_name, raw_xml in feed_data.items():
 		parsed_feed = feedparser.parse(raw_xml)
+		recent_episodes[feed_name] = []
 
 		if parsed_feed.bozo:
 			logging.warning(f"Feed '{feed_name}' is malformed: {parsed_feed.bozo_exception}")
@@ -108,8 +112,7 @@ def parse_recent_episodes(feed_data):
 			dt_mt = dt_utc.astimezone(ZoneInfo("America/Denver"))
 			clean_title = clean_html_text(entry.get('title', 'No Title'))
 			clean_description = clean_html_text(entry.get('summary', entry.get('description', 'No Description')))
-			recent_episodes.append({
-				'feed_name': feed_name,
+			recent_episodes[feed_name].append({
 				'title': clean_title,
 				'description': clean_description,
 				'publish_date_mt': dt_mt.strftime('%Y-%m-%d %I:%M %p %Z'),
@@ -118,6 +121,15 @@ def parse_recent_episodes(feed_data):
 	
 	return recent_episodes
 
+def format_email_body(episodes):
+	'''
+	Groups episodes by feed and constructs a plain text email body
+	with clearly separated section headers.
+	'''
+	if not episodes:
+		return "No new AI updates in the last 24 hours."
+	
+	grouped = 
 
 if __name__ == "__main__":
 	data = parse_recent_episodes(fetch_feeds(FEEDS))
