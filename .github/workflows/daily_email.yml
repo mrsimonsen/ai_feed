@@ -1,33 +1,33 @@
 name: Daily AI Feed Update
 
 on:
-	schedule:
-		# Run at 14:00 UTC
-		- cron: '0 14 * * *' #8am MDT (summer)
-		- cron: '0 15 * * *' #8am MST (winter)
-	workflow_dispatch:
+  schedule:
+    # Run at 14:00 UTC
+    - cron: '0 14 * * *' #8am MDT (summer)
+    - cron: '0 15 * * *' #8am MST (winter)
+  workflow_dispatch:
 
 jobs:
-	run-script:
-		runs-on: ubuntu-latest
+  run-script:
+    runs-on: ubuntu-latest
 
-		steps:
-			- name: Checkout repository
-			  uses: actions/checkout@v4
-			
-			- name: Set up Python
-			  uses: actions/setup-python@v5
-			  with:
-			    python-version: '3.12'
-			
-			- name: Install dependencies
-			  run: |
-			    python3 - m pip install --upgrade pip
-				pip install -r requirements.txt
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          python3 - m pip install --upgrade pip
+        pip install -r requirements.txt
 
-			- name: Execute Python script
-			  env: 
-			    SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
-			    SENDER_APP_PASS: ${{ secrets.SENDER_APP_PASS }}
-			    RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
-			  run: python3 main.py
+      - name: Execute Python script
+        env: 
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          SENDER_APP_PASS: ${{ secrets.SENDER_APP_PASS }}
+          RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+        run: python3 main.py
