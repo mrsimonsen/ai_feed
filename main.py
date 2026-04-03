@@ -5,6 +5,7 @@ import logging
 import os
 import requests
 import smtplib
+import sys
 import unicodedata
 from dotenv import load_dotenv
 from email.message import EmailMessage
@@ -102,7 +103,7 @@ def parse_recent_episodes(feed_data):
 				continue
 			try:
 				# struct_time has 9 items; datetime needs the first 6 (Y, M, D, H, M, S)
-				dt_utc = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+				dt_utc = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc) # type: ignore
 			except ValueError as e:
 				logging.warning(f"Invalid date values for '{unique_id}' in '{feed_name}'. Error: {e}")
 				continue
@@ -179,7 +180,7 @@ def send_email(body_text):
 		with smtplib.SMTP('smtp.gmail.com', 587) as server:
 			server.starttls()
 			#authenticate
-			server.login(SENDER_EMAIL, SENDER_APP_PASS)
+			server.login(SENDER_EMAIL, SENDER_APP_PASS)#type: ignore
 			server.send_message(msg)
 			logging.info("Email successfully dispatched.")
 	except smtplib.SMTPAuthenticationError:
@@ -189,6 +190,11 @@ def send_email(body_text):
 
 
 if __name__ == "__main__":
+	current_mt_time = datetime.now(ZoneInfo("America/Denver"))
+	if current_mt_time.hour != 8:
+		logging.info("Triggered at {current_mt_time.strftime('%I:%M %p %Z')}. Not 8 AM. Exiting silently.")
+		sys.exit(0)
+	
 	logging.info("Starting feed extraction...")
 	raw_data = fetch_feeds(FEEDS)
 	recent_episodes = parse_recent_episodes(raw_data)
