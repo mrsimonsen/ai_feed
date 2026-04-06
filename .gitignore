@@ -3,3 +3,4 @@ settings.json
 .env
 __pycache__/
 data/
+system_prompt.md
