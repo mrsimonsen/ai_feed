@@ -22,7 +22,7 @@ def transcribe(name, model='base'):
 
 	logger.info('Transcribing...')
 	result = model.transcribe(f'data/{name}.mp3', verbose=False)
-	with open(f'{name}.txt') as f:
+	with open(f'data/{name}.txt','w') as f:
 		f.write(result['text']) # type: ignore
 	logger.info('Transcription complete.')
 
@@ -34,7 +34,7 @@ def download_mp3(title, link):
 		response = requests.get(link, stream=True)
 		response.raise_for_status()
 		
-		with open(f'/data/{name}.mp3', 'wb') as f:
+		with open(f'data/{name}.mp3', 'wb') as f:
 			for chunk in response.iter_content(chunk_size=8192):
 				f.write(chunk)
 		logger.info(f'Successfully downloaded.')
@@ -45,19 +45,17 @@ def download_mp3(title, link):
 	except Exception as e:
 		logger.error(f'Unexpected error: {e}')
 
-def main(recent_episodes):
+def main(episode):
 	'''
 	Takes a dictionary of recent episode meta data and downloads the mp3 audio.
 	'''
 	os.mkdir('data')
-	for source in recent_episodes:
-		for ep in source:
-			#check for audio link
-			link = ep.get('audio_link')
-			if link:
-				#episode file name returned if successfully downloaded
-				name = download_mp3(ep.get('title'), link)
-				if name:
-					transcribe(name)
-				#clean up .mp3
-				os.remove(f'/data/{name}.mp3')
+	#check for audio link
+	link = episode.get('audio_link')
+	if link:
+		#episode file name returned if successfully downloaded
+		name = download_mp3(episode.get('title'), link)
+		if name:
+			transcribe(name)
+		#clean up .mp3
+		os.remove(f'data/{name}.mp3')
