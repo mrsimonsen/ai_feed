@@ -100,7 +100,7 @@ def parse_recent_episodes(feed_data, delta=24):
 			enclosure = entry.get('enclosures', [])
 			recent_episodes[feed_name].append({
 				'title': clean_title,
-				'duration': entry.get('itunes_duration', 'No Duration')
+				'duration': entry.get('itunes_duration', 'No Duration'),
 				'publish_date_mt': dt_mt.strftime('%Y-%m-%d %I:%M %p %Z'),
 				'description': clean_description,
 				'episode_link': entry.get('link', 'No Episode Link'),
