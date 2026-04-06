@@ -2,9 +2,8 @@ name: Daily AI Feed Update
 
 on:
   schedule:
-    # Run at 14:00 UTC
-    - cron: '0 14 * * *' #8am MDT (summer)
-    - cron: '0 15 * * *' #8am MST (winter)
+    # Run at 14:00 UTC (8am MDT)
+    - cron: '0 14 * * *'
   workflow_dispatch:
 
 jobs:
