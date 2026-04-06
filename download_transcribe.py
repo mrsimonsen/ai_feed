@@ -1,0 +1,63 @@
+import requests
+import logging
+import whisper
+import os
+
+logger = logging.getLogger(__name__)
+
+def transcribe(name, model='base'):
+	'''
+	Uses OpenAI's Whisper to transcribe a mp3 file into text
+	file: mp3 audio file path
+	model: Whisper model to use
+	Model  | Speed     | Accuracy    | Memory Req
+	tiny   | Fastest   | Lowest      | ~1 GB
+	base   | Fast      | Good        | ~1 GB
+	small  | Moderate  | High        | ~2 GB
+	medium | Slow      | Very High   | ~5 GB
+	large  | Very Slow | Exceptional | ~10 GB
+	'''
+	logger.info('Loading model...')
+	model = whisper.load_model(model)
+
+	logger.info('Transcribing...')
+	result = model.transcribe(f'data/{name}.mp3', verbose=False)
+	with open(f'{name}.txt') as f:
+		f.write(result['text']) # type: ignore
+	logger.info('Transcription complete.')
+
+def download_mp3(title, link):
+	name = title.replace(" ", '_')
+	logger.info(f'Downloading {name}')
+	try:
+		#stream instead of loading whole file into memory
+		response = requests.get(link, stream=True)
+		response.raise_for_status()
+		
+		with open(f'/data/{name}.mp3', 'wb') as f:
+			for chunk in response.iter_content(chunk_size=8192):
+				f.write(chunk)
+		logger.info(f'Successfully downloaded.')
+		return name
+
+	except requests.exceptions.RequestException as e:
+		logger.warning(f'Failed to download. Error: {e}')
+	except Exception as e:
+		logger.error(f'Unexpected error: {e}')
+
+def main(recent_episodes):
+	'''
+	Takes a dictionary of recent episode meta data and downloads the mp3 audio.
+	'''
+	os.mkdir('data')
+	for source in recent_episodes:
+		for ep in source:
+			#check for audio link
+			link = ep.get('audio_link')
+			if link:
+				#episode file name returned if successfully downloaded
+				name = download_mp3(ep.get('title'), link)
+				if name:
+					transcribe(name)
+				#clean up .mp3
+				os.remove(f'/data/{name}.mp3')

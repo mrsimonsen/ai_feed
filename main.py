@@ -1,6 +1,7 @@
 import logging
 import config
-import feed, message, clean_up, download, transcribe
+import feed, message, download_transcribe
+import shutil, os
 
 #RSS feeds
 FEEDS={
@@ -19,13 +20,10 @@ if __name__ == "__main__":
 	recent_episodes = feed.parse_recent_episodes(raw_data)
 	logger.info(f'Found {len(recent_episodes)} recent episodes.')
 
-	logger.info('Downloading new episodes')
-	#TODO: iterate through episodes and download them
-	download.main(recent_episodes)
-
-	logger.info('Transcribing episodes')
-	#TODO: use whisper to transcribe downloaded episodes
-	#transcribe.main(file)
+	logger.info('Downloading & Transcribing new episodes')
+	for source in recent_episodes:
+		for episode in source:
+			download_transcribe.main(episode)
 
 	logging.info('Customizing summary')
 	#TODO: use ollama with system prompt to generate custom summaries
@@ -37,7 +35,7 @@ if __name__ == "__main__":
 	message.send_email(email_body)
 
 	logging.info('Cleaning up...')
-	#TODO: clean_up
-	#clean_up.main()
+	if os.path.exists('/data'):
+		shutil.rmtree('/data')
 
 	logger.info('Process complete.')
