@@ -1,6 +1,6 @@
 import logging
 import config
-import feed, message, clean_up, download
+import feed, message, clean_up, download, transcribe
 
 #RSS feeds
 FEEDS={
@@ -25,6 +25,7 @@ if __name__ == "__main__":
 
 	logger.info('Transcribing episodes')
 	#TODO: use whisper to transcribe downloaded episodes
+	#transcribe.main(file)
 
 	logging.info('Customizing summary')
 	#TODO: use ollama with system prompt to generate custom summaries
