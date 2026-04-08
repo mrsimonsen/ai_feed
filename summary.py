@@ -17,10 +17,6 @@ def main(transcript, model="gemma4:e4b"):
 		logger.warning(f"'system_prompt.md' not found. Using default prompt.")
 		system_prompt = "You are a helpful assistant that summarizes text."
 
-	#extract transcript text
-	with open(transcript, 'r') as f:
-		text = f.read()
-	
 	#default Ollama API endpoint
 	url = "http://localhost:11434/api/chat"
 
@@ -28,13 +24,13 @@ def main(transcript, model="gemma4:e4b"):
 		'model': model,
 		'message': [
 			{'role': 'system', 'content': system_prompt},
-			{'role': 'user', 'content': f'Please summarize the following transcript:\n<transcript>{text}</transcript>'}
+			{'role': 'user', 'content': f'Please summarize the following transcript:\n<transcript>{transcript}</transcript>'}
 		],
 		'stream': False
 	}
 
 	try:
-		logger.info(f'Sending {transcript} to Ollama ({model})...')
+		logger.info(f'Sending transcript to Ollama ({model})...')
 		response = requests.post(url, json=payload, timeout=300)
 		response.raise_for_status()
 

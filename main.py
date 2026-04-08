@@ -27,6 +27,7 @@ if __name__ == "__main__":
 		
 		logging.info('Customizing summary')
 		episode.summary = summary.main(episode.summary)
+		summarized.append(episode)
 
 	logger.info('creating email')
 	email_body = message.format_email_body(summarized)
