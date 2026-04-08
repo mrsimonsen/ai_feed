@@ -2,3 +2,4 @@ outline.md
 .venv
 settings.json
 .env
+__pycache__/
