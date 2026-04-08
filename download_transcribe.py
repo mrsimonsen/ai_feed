@@ -48,7 +48,6 @@ def main(episode):
 	'''
 	Takes a dictionary of recent episode meta data and downloads the mp3 audio.
 	'''
-	os.mkdir('data')
 	name = download_mp3(episode.title, episode.audio_link)
 	if name:
 		episode.summary = transcribe(name)
