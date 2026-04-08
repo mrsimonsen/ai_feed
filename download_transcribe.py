@@ -49,12 +49,9 @@ def main(episode):
 	Takes a dictionary of recent episode meta data and downloads the mp3 audio.
 	'''
 	os.mkdir('data')
-	#check for audio link
-	link = episode.get('audio_link')
-	if link:
-		#episode file name returned if successfully downloaded
-		name = download_mp3(episode.get('title'), link)
-		if name:
-			transcribe(name)
-		#clean up .mp3
-		os.remove(f'data/{name}.mp3')
+	name = download_mp3(episode.title, episode.audio_link)
+	if name:
+		episode.summary = transcribe(name)
+	#clean up .mp3
+	os.remove(f'data/{name}.mp3')
+	return episode

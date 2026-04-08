@@ -4,7 +4,7 @@ import os
 
 logger = logging.getLogger(__name__)
 
-def main(transcript, model="llama3"):
+def main(transcript, model="gemma4:e4b"):
 	'''
 	Sends the transcript and system prompt to a local Ollama instance
 	to generate a personalized summary.

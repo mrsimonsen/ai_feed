@@ -13,6 +13,17 @@ HEADERS = {
 	'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 }
 
+class Episode():
+	def __init__(self):
+		self.source = 'No Source'
+		self.title = 'No Title'
+		self.pud_date_mt = datetime.now().strftime('%Y-%m-%d %I:%M %p %Z')
+		self.duration = '0'
+		self.description = 'No Description'
+		self.episode_link = 'No Episode Link'
+		self.audio_link = 'No Audio Link'
+		self.summary = 'No Summary'
+
 def fetch_feed(feeds_dict):
 	'''
 	Loops through a dictionary of RSS feeds, downloads the XML data,
@@ -61,12 +72,11 @@ def parse_recent_episodes(feed_data, delta=24):
 	now_utc = datetime.now(timezone.utc)
 	cutoff_time = now_utc - timedelta(hours=delta)
 
-	recent_episodes = {}
+	recent_episodes = []
 	seen_ids = set()
 
 	for feed_name, raw_xml in feed_data.items():
 		parsed_feed = feedparser.parse(raw_xml)
-		recent_episodes[feed_name] = []
 
 		if parsed_feed.bozo:
 			logging.warning(f"Feed '{feed_name}' is malformed: {parsed_feed.bozo_exception}")
@@ -94,17 +104,15 @@ def parse_recent_episodes(feed_data, delta=24):
 
 			#extract data
 			seen_ids.add(unique_id)
-			dt_mt = dt_utc.astimezone(ZoneInfo("America/Denver"))
-			clean_title = clean_html_text(entry.get('title', 'No Title'))
-			clean_description = clean_html_text(entry.get('summary', entry.get('description', 'No Description')))
-			enclosure = entry.get('enclosures', [])
-			recent_episodes[feed_name].append({
-				'title': clean_title,
-				'duration': entry.get('itunes_duration', 'No Duration'),
-				'publish_date_mt': dt_mt.strftime('%Y-%m-%d %I:%M %p %Z'),
-				'description': clean_description,
-				'episode_link': entry.get('link', 'No Episode Link'),
-				'audio_link': enclosure[0].get('href', 'No Audio Link')
-			})
+			ep = Episode()
+			ep.source = feed_name
+			ep.title = clean_html_text(entry.get('title', 'No Title'))
+			ep.pub_date_mt = dt_utc.astimezone(ZoneInfo("America/Denver")).strftime('%Y-%m-%d %I:%M %p %Z')#type: ignore
+			ep.description = clean_html_text(entry.get('summary', entry.get('description', 'No Description')))
+			ep.duration = entry.get('itunes_duration', 'No Duration')#type: ignore
+			ep.episode_link = entry.get('link', 'No Episode Link')#type: ignore
+			ep.audio_link = entry.get('enclosures', [])[0].get('href', 'No Audio Link')#type: ignore
+
+			recent_episodes.append(ep)
 	
 	return recent_episodes

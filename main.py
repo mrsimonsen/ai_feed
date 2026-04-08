@@ -1,6 +1,6 @@
 import logging
 import config
-import feed, message, download_transcribe
+import feed, message, download_transcribe, summary
 import shutil, os
 
 #RSS feeds
@@ -21,20 +21,15 @@ if __name__ == "__main__":
 	logger.info(f'Found {len(recent_episodes)} recent episodes.')
 
 	logger.info('Downloading & Transcribing new episodes')
-	for source in recent_episodes:
-		for episode in source:
-			transcript = download_transcribe.main(episode)
-			#summary[source].append()
-			#TODO: change recent_episodes so that I can replace the description
-			#with the summary. May be worth making a class object per episode
-			#instead of a dictionary of lists with dictionaries in it.
-
-
-	logging.info('Customizing summary')
-	#TODO: use ollama with system prompt to generate custom summaries
+	summarized = []
+	for episode in recent_episodes:
+		episode = download_transcribe.main(episode)
+		
+		logging.info('Customizing summary')
+		episode.summary = summary.main(episode.summary)
 
 	logger.info('creating email')
-	email_body = message.format_email_body(recent_episodes)
+	email_body = message.format_email_body(summarized)
 
 	logger.info("Attempting transmission...")
 	message.send_email(email_body)
