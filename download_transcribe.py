@@ -21,7 +21,7 @@ def transcribe(name, model='base'):
 	model = whisper.load_model(model)
 
 	logger.info('Transcribing...')
-	result = model.transcribe(f'data/{name}.mp3', verbose=False)
+	result = model.transcribe(f'{name}.mp3', verbose=False)
 	logger.info('Transcription complete.')
 	return result['text']
 
@@ -33,7 +33,7 @@ def download_mp3(title, link):
 		response = requests.get(link, stream=True)
 		response.raise_for_status()
 		
-		with open(f'data/{name}.mp3', 'wb') as f:
+		with open(f'{name}.mp3', 'wb') as f:
 			for chunk in response.iter_content(chunk_size=8192):
 				f.write(chunk)
 		logger.info(f'Successfully downloaded.')
@@ -53,5 +53,5 @@ def main(episode):
 	if name:
 		episode.summary = transcribe(name)
 	#clean up .mp3
-	os.remove(f'data/{name}.mp3')
+	os.remove(f'{name}.mp3')
 	return episode

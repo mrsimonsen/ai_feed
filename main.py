@@ -1,11 +1,10 @@
 import logging
 import config
 import feed, message, download_transcribe, summary
-import shutil, os
 
 #RSS feeds
 FEEDS={
-	'IBM Technology': "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFKWaEZ-_VweaEx1j62do_vQ",
+	#'IBM Technology': "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFKWaEZ-_VweaEx1j62do_vQ",
 	'The AI Daily Brief': "https://anchor.fm/s/f7cac464/podcast/rss",
 	'The AI in Business Podcast': "https://techemergence.libsyn.com/rss",
 	'Practical AI': "https://feeds.transistor.fm/practical-ai-machine-learning-data-science-llm"
@@ -34,9 +33,5 @@ if __name__ == "__main__":
 
 	logger.info("Attempting transmission...")
 	message.send_email(email_body)
-
-	logging.info('Cleaning up...')
-	if os.path.exists('/data'):
-		shutil.rmtree('/data')
 
 	logger.info('Process complete.')
