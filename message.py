@@ -14,30 +14,22 @@ def format_email_body(episodes):
 	Constructs a plain text email body with clearly separated section headers
 	from a dictionary of episodes grouped by feed.
 	'''
-	has_episodes = any(len(eps) > 0 for eps in episodes.values())
-	if not has_episodes:
+	if not len(episodes):
 		return "No new AI updates in the last 24 hours."
 	
 	lines = ["Here is your daily AI feed update:\n"]
 
-	for feed, eps in episodes.items():
-		#skip feeds without episodes
-		if not eps:
-			continue
-
+	for ep in episodes:
 		#source header
 		lines.append('='*50)
-		lines.append(f'Source: {feed.upper()}')
+		lines.append(f'Source: {ep.source.upper()}')
 		lines.append('='*50+'\n')
 
-		for ep in eps:
-			#TODO: update with additional details (duration, etc)
-			#TODO: add LLM summary instead of description
-			lines.append(f'TITLE: {ep['title']}')
-			lines.append(f'PUBLISHED: {ep['publish_date_mt']}')
-			lines.append(f'LINK: {ep['link']}\n')
-			lines.append(f'DESCRIPTION:\n{ep['description']}\n')
-			lines.append(f'-'*100+'\n')
+		lines.append(f'TITLE: {ep.title} | {ep.duration}')
+		lines.append(f'PUBLISHED: {ep.pub_date_mt}')
+		lines.append(f'LINK: {ep.episode_link}\n')
+		lines.append(f'SUMMARY:\n{ep.summary}\n')
+		lines.append(f'-'*100+'\n')
 
 	return '\n'.join(lines)
 
