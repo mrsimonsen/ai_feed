@@ -109,7 +109,11 @@ def parse_recent_episodes(feed_data, delta=24):
 			ep.pub_date_mt = dt_utc.astimezone(ZoneInfo("America/Denver")).strftime('%Y-%m-%d %I:%M %p %Z')#type: ignore
 			ep.duration = entry.get('itunes_duration', 'No Duration')#type: ignore
 			ep.episode_link = entry.get('link', 'No Episode Link')#type: ignore
-			ep.audio_link = entry.get('enclosures', [])[0].get('href', 'No Audio Link')#type: ignore
+
+			if enclosures := entry.get('enclosures', []):
+				ep.audio_link = enclosures[0].get('href', 'No Audio Link')#type: ignore
+			else:
+				ep.audio_link = ep.episode_link
 
 			recent_episodes.append(ep)
 	

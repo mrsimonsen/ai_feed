@@ -3,3 +3,4 @@ feedparser
 bleach
 dotenv
 openai-whisper
+yt_dlp
