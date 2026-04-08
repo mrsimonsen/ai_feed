@@ -22,7 +22,7 @@ def main(transcript, model="gemma4:e4b"):
 
 	payload = {
 		'model': model,
-		'message': [
+		'messages': [
 			{'role': 'system', 'content': system_prompt},
 			{'role': 'user', 'content': f'Please summarize the following transcript:\n<transcript>{transcript}</transcript>'}
 		],
