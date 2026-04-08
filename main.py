@@ -23,7 +23,12 @@ if __name__ == "__main__":
 	logger.info('Downloading & Transcribing new episodes')
 	for source in recent_episodes:
 		for episode in source:
-			download_transcribe.main(episode)
+			transcript = download_transcribe.main(episode)
+			#summary[source].append()
+			#TODO: change recent_episodes so that I can replace the description
+			#with the summary. May be worth making a class object per episode
+			#instead of a dictionary of lists with dictionaries in it.
+
 
 	logging.info('Customizing summary')
 	#TODO: use ollama with system prompt to generate custom summaries

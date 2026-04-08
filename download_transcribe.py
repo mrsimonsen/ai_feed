@@ -22,9 +22,8 @@ def transcribe(name, model='base'):
 
 	logger.info('Transcribing...')
 	result = model.transcribe(f'data/{name}.mp3', verbose=False)
-	with open(f'data/{name}.txt','w') as f:
-		f.write(result['text']) # type: ignore
 	logger.info('Transcription complete.')
+	return result['text']
 
 def download_mp3(title, link):
 	name = title.replace(" ", '_')
