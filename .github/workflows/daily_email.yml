@@ -2,9 +2,7 @@ name: Daily AI Feed Update
 
 on:
   schedule:
-    # Run at 14:00 UTC
-    - cron: '0 14 * * *' #8am MDT (summer)
-    - cron: '0 15 * * *' #8am MST (winter)
+    - cron: '0 13 * * *' #7am MDT
   workflow_dispatch:
 
 jobs:
@@ -20,6 +18,11 @@ jobs:
         with:
           python-version: '3.12'
       
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y ffmpeg
+
       - name: Install dependencies
         run: |
           python3 - m pip install --upgrade pip
