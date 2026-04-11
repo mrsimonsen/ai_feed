@@ -6,8 +6,8 @@ Remove RSS-specific packages (feedparser, bleach) from requirements.txt since th
 Replace the RSS fetch and parse logic entirely. The new version should read the CSV exported from your Google Sheet, map each row to an Episode object (source, title, link), and return the list. No date filtering needed — process all rows that don't already have tags assigned.~~
 4. ~~Keep download_transcribe.py as-is
 The download and Whisper transcription logic doesn't need to change. It already handles both YouTube and MP3 links, which covers your sources.~~
-5. Rewrite system_prompt.md
-This is the core logic change. The new prompt should instruct the LLM to return structured output (JSON) containing: a list of assigned tags drawn from the defined tag list, and a relevance decision — keep or remove — with a brief reason. The prompt should include the full tag list and descriptions so the model has the vocabulary to work with. Note: the model should be opinionated about relevance. If an episode is too technical (deep MLOps, chip manufacturing, academic research), too consumer-focused, or just doesn't map to any of your tags, it should flag it for removal rather than forcing a tag fit.
+5. ~~Rewrite system_prompt.md
+This is the core logic change. The new prompt should instruct the LLM to return structured output (JSON) containing: a list of assigned tags drawn from the defined tag list, and a relevance decision — keep or remove — with a brief reason. The prompt should include the full tag list and descriptions so the model has the vocabulary to work with. Note: the model should be opinionated about relevance. If an episode is too technical (deep MLOps, chip manufacturing, academic research), too consumer-focused, or just doesn't map to any of your tags, it should flag it for removal rather than forcing a tag fit.~~
 6. Rewrite summary.py → rename to tagger.py
 Repurpose the Ollama API call to request structured JSON output instead of a free-text summary. Parse the response and attach the tags and relevance decision back onto the Episode object. Add error handling for malformed JSON responses.
 7. Update main.py

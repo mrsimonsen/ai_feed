@@ -54,7 +54,7 @@ def download_youtube_audio(title, link):
 	}
 
 	try:
-		with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+		with yt_dlp.YoutubeDL(ydl_opts) as ydl:#type: ignore
 			ydl.download([link])
 		logger.info(f'Successfully downloaded YouTube audio.')
 		return name

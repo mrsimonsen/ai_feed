@@ -15,8 +15,7 @@ if __name__ == "__main__":
 	logger = logging.getLogger(__name__)
 
 	logger.info('Starting feed extraction...')
-	raw_data = feed.fetch_feed(FEEDS)
-	recent_episodes = feed.parse_recent_episodes(raw_data)
+	recent_episodes = feed.load_untagged_episodes()
 	logger.info(f'Found {len(recent_episodes)} recent episodes.')
 
 	logger.info('Downloading & Transcribing new episodes')
@@ -28,10 +27,6 @@ if __name__ == "__main__":
 		episode.summary = summary.main(episode.summary)
 		summarized.append(episode)
 
-	logger.info('creating email')
-	email_body = message.format_email_body(summarized)
-
-	logger.info("Attempting transmission...")
-	message.send_email(email_body)
+	
 
 	logger.info('Process complete.')
