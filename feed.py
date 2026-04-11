@@ -3,7 +3,7 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-CONTENT_CSV = 'AI_resource__-_Content.csv'
+CONTENT_CSV = 'AI_resources__-_Content.csv'
 
 class Episode():
 	def __init__(self):
