@@ -1,14 +1,6 @@
 import logging
 import config
-import feed, message, download_transcribe, summary
-
-#RSS feeds
-FEEDS={
-	'IBM Technology': "https://www.youtube.com/feeds/videos.xml?playlist_id=UULFKWaEZ-_VweaEx1j62do_vQ",
-	'The AI Daily Brief': "https://anchor.fm/s/f7cac464/podcast/rss",
-	'The AI in Business Podcast': "https://techemergence.libsyn.com/rss",
-	'Practical AI': "https://feeds.transistor.fm/practical-ai-machine-learning-data-science-llm"
-}
+import feed, download_transcribe, tagger
 
 if __name__ == "__main__":
 	config.setup_logging()
@@ -23,8 +15,11 @@ if __name__ == "__main__":
 	for episode in recent_episodes:
 		episode = download_transcribe.main(episode)
 		
-		logging.info('Customizing summary')
-		episode.summary = summary.main(episode.summary)
+		logging.info('Tagging...')
+		tags, decision, reason = tagger.main(episode.summary)
+		episode.tags = tags
+		episode.decision = decision
+		episode.relevance_note = reason
 		summarized.append(episode)
 
 	

@@ -10,8 +10,10 @@ class Episode():
 		self.source = 'No Source'
 		self.title = 'No Title'
 		self.audio_link = 'No Audio Link'
+		self.summary = 'No summary'
 		self.tags = []
 		self.relevance_note = ''
+		self.decision = ''
 
 def load_untagged_episodes(csv_path=CONTENT_CSV):
 	'''
