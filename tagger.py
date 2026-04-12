@@ -32,7 +32,7 @@ def _extract_json(text: str) -> str:
 
     return text.strip()
 
-def main(transcript: str, model: str = 'gemma4:26b') -> dict:
+def main(summary: str, model: str = 'gemma4:e4b') -> dict:
     """
     Sends a transcript to a local Ollama instance and returns a dict with:
         tags     : list[str]
@@ -50,7 +50,7 @@ def main(transcript: str, model: str = 'gemma4:26b') -> dict:
         'model': model,
         'messages': [
             {'role': 'system',    'content': system_prompt},
-            {'role': 'user',      'content': f'Tag the following transcript:\n<transcript>{transcript}</transcript>'},
+            {'role': 'user',      'content': f'Tag the following context extraction:\n<extraction>{summary}</extraction>'},
             {'role': 'assistant', 'content': '{'}  # prefill — forces the model to continue as JSON
         ],
         'format': 'json',
