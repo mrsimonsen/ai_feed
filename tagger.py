@@ -6,7 +6,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT_PATH = 'system_prompt.md'
+SYSTEM_PROMPT_PATH = 'tagger_system_prompt.md'
 OLLAMA_URL         = 'http://localhost:11434/api/chat'
 
 def _load_system_prompt() -> str:
@@ -18,9 +18,9 @@ def _load_system_prompt() -> str:
 
 def _extract_json(text: str) -> str:
     """
-    Ollama's behaviour with assistant prefill is inconsistent — sometimes it
+    Ollama's behavior with assistant prefill is inconsistent — sometimes it
     includes the opening brace in the returned content, sometimes it doesn't.
-    Normalise to a complete JSON object either way, then strip code fences.
+    Normalize to a complete JSON object either way, then strip code fences.
     """
     if not text.lstrip().startswith('{'):
         text = '{' + text
@@ -32,7 +32,7 @@ def _extract_json(text: str) -> str:
 
     return text.strip()
 
-def main(transcript: str, model: str = 'gemma4:e4b') -> dict:
+def main(transcript: str, model: str = 'gemma4:26b') -> dict:
     """
     Sends a transcript to a local Ollama instance and returns a dict with:
         tags     : list[str]
@@ -59,7 +59,7 @@ def main(transcript: str, model: str = 'gemma4:e4b') -> dict:
 
     try:
         logger.info(f"Sending transcript to Ollama ({model}) for tagging...")
-        response = requests.post(OLLAMA_URL, json=payload, timeout=300)
+        response = requests.post(OLLAMA_URL, json=payload, timeout=500)
         response.raise_for_status()
 
         raw_content = response.json().get('message', {}).get('content', '')

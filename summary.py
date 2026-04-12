@@ -4,13 +4,15 @@ import os
 
 logger = logging.getLogger(__name__)
 
+SUMMARY_SYSTEM_PROMPT = 'summarize_system_prompt.md'
+
 def main(transcript, model="gemma4:e4b"):
 	'''
 	Sends the transcript and system prompt to a local Ollama instance
 	to generate a personalized summary.
 	'''
 	#load system prompt
-	if os.path.exists("system_prompt.md"):
+	if os.path.exists("SUMMARY_SYSTEM_PROMPT"):
 		with open("system_prompt.md", 'r') as f:
 			system_prompt = f.read()
 	else:
