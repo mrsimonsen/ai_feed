@@ -1,8 +1,8 @@
 name: Daily AI Feed Update
 
-on:
-  schedule:
-    - cron: '0 13 * * *' #7am MDT
+#on:
+#  schedule:
+#    - cron: '0 13 * * *' #7am MDT
   workflow_dispatch:
 
 jobs:
